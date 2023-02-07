@@ -94,6 +94,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
+							"\r",
+							"\r",
 							"let jsonData = pm.response.json();\r",
 							"\r",
 							"pm.test(\"Validate Status code is 200\", function () {\r",
@@ -117,6 +119,16 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"id\", 11);\r",
+							"pm.collectionVariables.set(\"timestamp\", new Date().toISOString());"
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -130,7 +142,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"id\": 11,\r\n  \"name\": \"Chain Reaction\",\r\n    \"reviewScore\": 10,\r\n  \"category\": \"Mobile Game\",\r\n  \"rating\": \"4.5\"\r\n  \r\n}",
+					"raw": "{\r\n  \"id\": {{id}},\r\n  \"name\": \"Chain Reaction\",\r\n  \"releaseDate\": \"{{timestamp}}\",\r\n  \"reviewScore\": 10,\r\n  \"category\": \"Mobile Game\",\r\n  \"rating\": \"4.5\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -147,6 +159,231 @@
 					"path": [
 						"app",
 						"videogames"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Return new created Game",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();\r",
+							" let count = Object.keys(jsonData).length;\r",
+							"\r",
+							"pm.test(\"Total number of responses : \" + count , () => {\r",
+							"   console.log(count);\r",
+							"    pm.expect(count).to.be.above(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 3000 ms\", () => {\r",
+							"        pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code name has string : OK \", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate id of new created game \", () => {\r",
+							"    pm.expect(pm.collectionVariables.get(\"id\")).to.be.eql(jsonData.id);\r",
+							"})\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/app/videogames/{{id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"app",
+						"videogames",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletes a video game from the DB by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validate success message : \", () => {\r",
+							"    pm.expect(jsonData.status).to.be.eql(\"Record Deleted Successfully\");\r",
+							"})\r",
+							"pm.test(\"Validate Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 3000 ms\", () => {\r",
+							"        pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code name has string : OK \", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/app/videogames/{{id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"app",
+						"videogames",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update an existing video game in the DB by specifying a new body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Validate Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 3000 ms\", () => {\r",
+							"        pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code name has string : OK \", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							" \r",
+							"pm.collectionVariables.unset(\"timestamp\");\r",
+							"pm.collectionVariables.unset(\"id\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 12,\r\n  \"name\": \"Candy Crash\",\r\n  \"releaseDate\": \"{{timestamp}}\",\r\n  \"reviewScore\": 15,\r\n  \"category\": \"Business\",\r\n  \"rating\": \"98\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/app/videogames/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"app",
+						"videogames",
+						"1"
 					]
 				}
 			},
